@@ -58,3 +58,5 @@ IMAGE_INSTALL += "${CUBE_DOM_GW_EXTRA_INSTALL}"
 inherit core-image
 inherit builder-base
 
+# Override the cube configuration of networkd
+ROOTFS_POSTPROCESS_COMMAND_remove = "systemd_openvswitch_network;"

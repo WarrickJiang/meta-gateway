@@ -83,3 +83,5 @@ ALTERNATIVE_PRIORITY_xfce4-session[x-session-manager] = "60"
 inherit core-image
 inherit builder-base
 
+# Override the cube configuration of networkd
+ROOTFS_POSTPROCESS_COMMAND_remove = "systemd_openvswitch_network;"
