@@ -10,6 +10,7 @@ SRC_URI += "\
             file://dnsmasq.service \
             "
 
+RDEPENDS_${PN} += "start-stop-daemon"
 INITSCRIPT_NAME = "dnsmasq"
 SYSTEMD_SERVICE_${PN} = "dnsmasq.service"
 
