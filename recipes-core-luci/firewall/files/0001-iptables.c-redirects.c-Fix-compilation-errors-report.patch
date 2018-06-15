@@ -1,0 +1,94 @@
+From e4926fda2e8c68f85aec48118fdfccbef6eeea66 Mon Sep 17 00:00:00 2001
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Fri, 15 Jun 2018 08:39:05 -0700
+Subject: [PATCH] iptables.c, redirects.c: Fix compilation errors reported by
+ gcc 8.1.0
+
+The string buffer could have truncation if someone uses a port that is out of range.
+
+iptables.c:902:21: error: '%u' directive writing between 1 and 10 bytes into a region of size between 7 and 11 [-Werror=format-overflow=]
+    sprintf(buf, "%u:%u", sp->port_min, sp->port_max);
+                     ^~
+iptables.c:902:17: note: directive argument in the range [0, 2147483647]
+    sprintf(buf, "%u:%u", sp->port_min, sp->port_max);
+                 ^~~~~~~
+iptables.c:902:4: note: 'sprintf' output between 4 and 17 bytes into a destination of size 13
+    sprintf(buf, "%u:%u", sp->port_min, sp->port_max);
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+iptables.c:912:21: error: '%u' directive writing between 1 and 10 bytes into a region of size between 7 and 11 [-Werror=format-overflow=]
+    sprintf(buf, "%u:%u", dp->port_min, dp->port_max);
+                     ^~
+iptables.c:912:17: note: directive argument in the range [0, 2147483647]
+    sprintf(buf, "%u:%u", dp->port_min, dp->port_max);
+                 ^~~~~~~
+iptables.c:912:4: note: 'sprintf' output between 4 and 17 bytes into a destination of size 13
+    sprintf(buf, "%u:%u", dp->port_min, dp->port_max);
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+---
+ iptables.c  | 14 ++++++++++++--
+ redirects.c | 10 +++++++---
+ 2 files changed, 19 insertions(+), 5 deletions(-)
+
+diff --git a/iptables.c b/iptables.c
+index d848239..70e74cf 100644
+--- a/iptables.c
++++ b/iptables.c
+@@ -897,9 +897,14 @@ fw3_ipt_rule_sport_dport(struct fw3_ipt_rule *r,
+ 	if (sp && sp->set)
+ 	{
+ 		if (sp->port_min == sp->port_max)
++                {
+ 			sprintf(buf, "%u", sp->port_min);
++                }
+ 		else
+-			sprintf(buf, "%u:%u", sp->port_min, sp->port_max);
++                {
++			if (snprintf(buf, sizeof(buf), "%u:%u", sp->port_min, sp->port_max) >= sizeof(buf))
++                                info("     ! Warning port range too large, string truncated");
++                }
+ 
+ 		fw3_ipt_rule_addarg(r, sp->invert, "--sport", buf);
+ 	}
+@@ -907,9 +912,14 @@ fw3_ipt_rule_sport_dport(struct fw3_ipt_rule *r,
+ 	if (dp && dp->set)
+ 	{
+ 		if (dp->port_min == dp->port_max)
++                {
+ 			sprintf(buf, "%u", dp->port_min);
++                }
+ 		else
+-			sprintf(buf, "%u:%u", dp->port_min, dp->port_max);
++                {
++			if (snprintf(buf, sizeof(buf), "%u:%u", dp->port_min, dp->port_max) >= sizeof(buf))
++                                info("     ! Warning port range too large, string truncated");
++                }
+ 
+ 		fw3_ipt_rule_addarg(r, dp->invert, "--dport", buf);
+ 	}
+diff --git a/redirects.c b/redirects.c
+index e651ddd..9e4f99d 100644
+--- a/redirects.c
++++ b/redirects.c
+@@ -392,10 +392,14 @@ set_redirect(struct fw3_ipt_rule *r, struct fw3_port *port)
+ 	if (port && port->set)
+ 	{
+ 		if (port->port_min == port->port_max)
++                {
+ 			sprintf(buf, "%u", port->port_min);
+-		else
+-			sprintf(buf, "%u-%u", port->port_min, port->port_max);
+-
++                }
++                else
++                {
++                        if (snprintf(buf, sizeof(buf), "%u-%u", port->port_min, port->port_max) >= sizeof(buf))
++                                info("     ! Warning port range too large, string truncated");
++                }
+ 		fw3_ipt_rule_addarg(r, false, "--to-ports", buf);
+ 	}
+ }
+-- 
+2.17.1
+

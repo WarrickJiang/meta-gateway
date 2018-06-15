@@ -11,6 +11,7 @@ SRC_URI = "git://git.openwrt.org/project/firewall3.git \
 	   file://firewall.service \
 	   file://README \
 	   file://firewall-kmod.conf \
+	   file://0001-iptables.c-redirects.c-Fix-compilation-errors-report.patch \
 "
 
 SRCREV = "a4d98aea373e04f3fdc3c492c1688ba52ce490a9"
