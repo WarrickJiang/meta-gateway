@@ -4,7 +4,7 @@ better access to kernel APIs with the ability to listen on netlink events."
 LICENSE = "GPLv2"
 SECTION = "console/utils"
 DEPENDS = "uci libnl json-c libubox ubus"
-RDEPENDS_${PN} += "libnl dhcp-client comgt ppp hostapd libqmi"
+RDEPENDS_${PN} += "libnl dhcp-client comgt ppp hostapd libqmi gw-base which"
 
 inherit update-alternatives
 
