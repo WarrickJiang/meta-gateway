@@ -1,6 +1,6 @@
 [Unit]
 Description=Firstboot for GateWay
-Before=sysinit.target shutdown.target systemd-update-done.service
+Before=sysinit.target shutdown.target systemd-update-done.service boot-stage4.service
 After=systemd-udevd.service run-postinsts.service systemd-remount-fs.service systemd-tmpfiles-setup.service tmp.mount
 DefaultDependencies=no
 

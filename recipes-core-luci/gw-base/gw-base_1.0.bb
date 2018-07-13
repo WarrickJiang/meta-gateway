@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://${WR_EXTRA_LIC_DIR}/windriver;md5=eb3421117285c0b7ccb
 
 PR = "r1"
 
-RDEPENDS_${PN} = "btrfs-tools"
+RDEPENDS_${PN} = "btrfs-tools gw-boot"
 
 SRC_URI += " \
     file://firstboot.service \

@@ -17,6 +17,13 @@ else
 fi
 
 # Set hostname from ethernet MAC address/kernel UUID/date random
+if [ ! -e /etc/config/system ]; then
+	cat <<EOF > /etc/config/system
+config system
+	option hostname 'PulsarGateway'
+EOF
+fi
+
 ifconfig eth0 up
 hostname_id=$(cat /sys/class/net/eth0/address 2>&- | sed 's/://g')
 [ -z "${hostname_id}" ] && {
